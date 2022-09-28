@@ -195,6 +195,7 @@ contract ERC721AFacet is IERC721AFacet {
      * If there are multiple variables, please pack them into a uint64.
      */
     function _setAux(address owner, uint64 aux) external {
+        GlobalState.requireCallerIsAdmin();
         uint256 packed = ERC721AStorage.layout()._packedAddressData[owner];
         uint256 auxCasted;
         // Cast `aux` with assembly to avoid redundant masking.
@@ -1092,6 +1093,7 @@ contract ERC721AFacet is IERC721AFacet {
      * If there are multiple variables, please pack them into a uint64.
      */
     function __setAux(address owner, uint64 aux) external payable {
+        GlobalState.requireCallerIsAdmin();
         uint256 packed = ERC721AStorage.layout()._packedAddressData[owner];
         uint256 auxCasted;
         // Cast `aux` with assembly to avoid redundant masking.

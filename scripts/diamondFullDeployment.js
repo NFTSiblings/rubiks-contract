@@ -12,13 +12,13 @@ async function deployDiamond () {
   const DiamondCutFacet = await ethers.getContractFactory('DiamondCutFacet')
   const diamondCutFacet = await DiamondCutFacet.deploy()
   await diamondCutFacet.deployed()
-  //console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
+  console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
 
   // deploy Diamond
-  const Diamond = await ethers.getContractFactory('ERC721ADiamondTemplate')
+  const Diamond = await ethers.getContractFactory('ERC721ADiamondTemplateTest')
   const diamond = await Diamond.deploy(diamondCutFacet.address)
   await diamond.deployed()
-  //console.log('Diamond deployed:', diamond.address)
+  console.log('Diamond deployed:', diamond.address)
 
   // deploy DiamondInit
   // DiamondInit provides a function that is called when the diamond is upgraded to initialize state variables
@@ -26,11 +26,11 @@ async function deployDiamond () {
   const DiamondInit = await ethers.getContractFactory('DiamondInit')
   const diamondInit = await DiamondInit.deploy()
   await diamondInit.deployed()
-  //console.log('DiamondInit deployed:', diamondInit.address)
+  console.log('DiamondInit deployed:', diamondInit.address)
 
   // deploy facets
-  //console.log('')
-  //console.log('Deploying facets')
+  console.log('')
+  console.log('Deploying facets')
   const cut = []
 
   // Going for a manual diamondCut array to learn to manupilate the cut array properly
@@ -40,7 +40,7 @@ async function deployDiamond () {
   const AdminPauseFacet = await ethers.getContractFactory("AdminPauseFacet")
   const AdminPausefacet = await AdminPauseFacet.deploy()
   await AdminPausefacet.deployed()
-  //console.log('AdminPauseFacet deployed: ' + AdminPausefacet.address)
+  console.log('AdminPauseFacet deployed: ' + AdminPausefacet.address)
   cut.push({
     facetAddress: AdminPausefacet.address,
     action: FacetCutAction.Add,
@@ -51,7 +51,7 @@ async function deployDiamond () {
   const AdminPrivilegesFacet = await ethers.getContractFactory("AdminPrivilegesFacet")
   const AdminPrivilegesfacet = await AdminPrivilegesFacet.deploy()
   await AdminPrivilegesfacet.deployed()
-  //console.log('AdminPrivilegesFacet deployed: ' + AdminPrivilegesfacet.address)
+  console.log('AdminPrivilegesFacet deployed: ' + AdminPrivilegesfacet.address)
   cut.push({
     facetAddress: AdminPrivilegesfacet.address,
     action: FacetCutAction.Add,
@@ -62,7 +62,7 @@ async function deployDiamond () {
   const AllowlistFacet = await ethers.getContractFactory("AllowlistFacet")
   const Allowlistfacet = await AllowlistFacet.deploy()
   await Allowlistfacet.deployed()
-  //console.log('AllowlistFacet deployed: ' + Allowlistfacet.address)
+  console.log('AllowlistFacet deployed: ' + Allowlistfacet.address)
   cut.push({
     facetAddress: Allowlistfacet.address,
     action: FacetCutAction.Add,
@@ -73,7 +73,7 @@ async function deployDiamond () {
   const CenterFacet = await ethers.getContractFactory("CenterFacet")
   const Centerfacet = await CenterFacet.deploy()
   await Centerfacet.deployed()
-  //console.log('CenterFacet deployed: ' + Centerfacet.address)
+  console.log('CenterFacet deployed: ' + Centerfacet.address)
   cut.push({
     facetAddress: Centerfacet.address,
     action: FacetCutAction.Add,
@@ -84,7 +84,7 @@ async function deployDiamond () {
   const DiamondLoupeFacet = await ethers.getContractFactory("DiamondLoupeFacet")
   const DiamondLoupefacet = await DiamondLoupeFacet.deploy()
   await DiamondLoupefacet.deployed()
-  //console.log('DiamondLoupeFacet deployed: ' + DiamondLoupefacet.address)
+  console.log('DiamondLoupeFacet deployed: ' + DiamondLoupefacet.address)
   cut.push({
     facetAddress: DiamondLoupefacet.address,
     action: FacetCutAction.Add,
@@ -95,7 +95,7 @@ async function deployDiamond () {
   const ERC165Facet = await ethers.getContractFactory("ERC165Facet")
   const ERC165facet = await ERC165Facet.deploy()
   await ERC165facet.deployed()
-  //console.log('ERC165Facet deployed: ' + ERC165facet.address)
+  console.log('ERC165Facet deployed: ' + ERC165facet.address)
   cut.push({
     facetAddress: ERC165facet.address,
     action: FacetCutAction.Add,
@@ -107,7 +107,7 @@ async function deployDiamond () {
   const ERC721Afacet = await ERC721AFacet.deploy()
   await ERC721Afacet.deployed()
   getSelectors(ERC721Afacet)
-  //console.log('ERC721AFacet deployed: ' + ERC721Afacet.address)
+  console.log('ERC721AFacet deployed: ' + ERC721Afacet.address)
   const sig = [
     '0x095ea7b3', '0xa22cb465',
     '0x70a08231', '0x081812fc',
@@ -125,7 +125,7 @@ async function deployDiamond () {
   const PaymentSplitterFacet = await ethers.getContractFactory("PaymentSplitterFacet")
   const PaymentSplitterfacet = await PaymentSplitterFacet.deploy()
   await PaymentSplitterfacet.deployed()
-  //console.log('PaymentSplitterFacet deployed: ' + PaymentSplitterfacet.address)
+  console.log('PaymentSplitterFacet deployed: ' + PaymentSplitterfacet.address)
   cut.push({
     facetAddress: PaymentSplitterfacet.address,
     action: FacetCutAction.Add,
@@ -136,7 +136,7 @@ async function deployDiamond () {
   const RoyaltiesConfigFacet = await ethers.getContractFactory("RoyaltiesConfigFacet")
   const RoyaltiesConfigfacet = await RoyaltiesConfigFacet.deploy()
   await RoyaltiesConfigfacet.deployed()
-  //console.log('RoyaltiesConfigFacet deployed: ' + RoyaltiesConfigfacet.address)
+  console.log('RoyaltiesConfigFacet deployed: ' + RoyaltiesConfigfacet.address)
   cut.push({
     facetAddress:RoyaltiesConfigfacet.address,
     action: FacetCutAction.Add,
@@ -146,7 +146,7 @@ async function deployDiamond () {
   const SaleHandlerFacet = await ethers.getContractFactory("SaleHandlerFacet")
   const SaleHandlerfacet = await SaleHandlerFacet.deploy()
   await SaleHandlerfacet.deployed()
-  //console.log('SaleHandlerFacet deployed: ' + SaleHandlerfacet.address)
+  console.log('SaleHandlerFacet deployed: ' + SaleHandlerfacet.address)
   cut.push({
     facetAddress: SaleHandlerfacet.address,
     action: FacetCutAction.Add,
@@ -154,18 +154,18 @@ async function deployDiamond () {
   })
 
   // upgrade diamond with facets
-  //console.log('')
-  //console.log('Diamond Cut:', cut)
+  console.log('')
+  console.log('Diamond Cut:', cut)
   const diamondCut = await ethers.getContractAt('IDiamondCut', diamond.address)
   let tx
   let receipt
   // call to init function
   let functionCall = diamondInit.interface.encodeFunctionData('initAll')
-  //console.log(functionCall)
+  console.log(functionCall)
   tx = await diamondCut.diamondCut(cut, diamondInit.address, functionCall)
-  //console.log('Diamond cut tx: ', tx.hash)
+  console.log('Diamond cut tx: ', tx.hash)
   receipt = await tx.wait()
-  //console.log('')
+  console.log('')
 
 
   const CenterFacetDeployed = await ethers.getContractAt('CenterFacet', diamond.address)
@@ -175,7 +175,7 @@ async function deployDiamond () {
   if (!receipt.status) {
     throw Error(`Diamond upgrade failed: ${tx.hash}`)
   }
-  //console.log('Completed diamond cut')
+  console.log('Completed diamond cut')
   const diamondAddresses = new Object()
   diamondAddresses.Diamond = diamond.address
   diamondAddresses.DiamondInit = diamondInit.address

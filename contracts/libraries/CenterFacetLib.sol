@@ -223,7 +223,9 @@ library CenterFacetLib {
             getState().levels[four[0]]++;
             emit merge(four[0], 5,from);
         }
-        getState().ERC721AFacet.delegatecall(_delegateCall);
+        else {
+            getState().ERC721AFacet.delegatecall(_delegateCall);
+        }
     }
 
     function _mergeThree(address from, address to, uint256 tokenId, bytes memory _delegateCall) internal {
@@ -238,7 +240,9 @@ library CenterFacetLib {
                 emit merge(four[0], 5, from);
             }
         }
-        getState().ERC721AFacet.delegatecall(_delegateCall);
+        else {
+            getState().ERC721AFacet.delegatecall(_delegateCall);
+        }
     }
 
     // SPECIAL FUNCTIONALITY FOR MERGE //

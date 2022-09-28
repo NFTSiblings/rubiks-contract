@@ -100,21 +100,20 @@ contract CenterFacet {
         else if(SaleHandlerLib.isPublicSaleActive()) {
             phase = 2;
         }
-        require(phase == 1 || phase == 2, "Sale has either not started or ended already");
+        require(phase == 1 || phase == 2, "CenterFacet: Sale is not active");
         if (phase == 1) AllowlistLib.requireValidProof(_merkleProof);
 
         CenterFacetLib.state storage s = CenterFacetLib.getState();
         uint256 _price = s.price[phase - 1];
         require(msg.value == _price * amount, "CenterFacet: incorrect amount of ether sent");
 
-        uint256 _walletCap = s.walletCap;
         uint256 numberMinted = CenterFacetLib._numberMinted(msg.sender);
         require(
-            amount + numberMinted <= _walletCap,
+            amount + numberMinted <=  s.walletCap,
             string(
                 abi.encodePacked(
                     "CenterFacet: maximum tokens per wallet during the sale is ",
-                    CenterFacetLib._toString(_walletCap)
+                    CenterFacetLib._toString(s.walletCap)
                 )
             )
         );
@@ -145,7 +144,7 @@ contract CenterFacet {
         ));
     }
 
-    function _safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external payable {
         CenterFacetLib._beforeTokenTransfer(from, to, tokenId, abi.encodeWithSignature(
             "_safeTransferFrom(address,address,uint256,bytes)", from, to, tokenId, _data
         ));

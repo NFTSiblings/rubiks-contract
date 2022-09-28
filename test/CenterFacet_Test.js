@@ -347,11 +347,11 @@ describe("CenterFacet", () => {
 
         })
 
-        it('mint function reverted as either sale did not start or sale ended', async () => {
+        it('mint function reverted as either sale did not start', async () => {
 
             const amountToMint = 4
             await expect(CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value:price*amountToMint}))
-            .to.be.revertedWith('Sale has either not started or ended already')
+            .to.be.revertedWith('CenterFacet: Sale is not active')
 
         })
 
@@ -469,7 +469,9 @@ describe("CenterFacet", () => {
         it('mint function reverted as improper amount sent', async () => {
 
             const amountToMint = 4
-            await expect(CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*2}))
+            await expect(CenterFacet.connect(address1).mint(amountToMint, [], {value: price*2}))
+            .to.be.revertedWith('CenterFacet: incorrect amount of ether sent')
+            await expect(CenterFacet.connect(address1).mint(amountToMint, []))
             .to.be.revertedWith('CenterFacet: incorrect amount of ether sent')
 
         })
@@ -477,10 +479,9 @@ describe("CenterFacet", () => {
         it('mint function reverted as minting more than walletCap', async () => {
 
             const amountToMint = 1
-            await CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint})
-            await CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint})
-            await CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint})
-            await CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint})
+            for(let i = 0; i < 4; i++) {
+                await CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint})
+            }
             await expect(CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value: price*amountToMint}))
             .to.be.revertedWith('CenterFacet: maximum tokens per wallet during the sale is 4')
 
@@ -1122,7 +1123,7 @@ describe("CenterFacet", () => {
 
         it("_safeTransferFrom(bytes) function reverting if the token doesn't exist", async () => {
 
-            await expect(CenterFacet.connect(owner).transferFrom(owner.address, address5.address, 2334))
+            await expect(CenterFacet.connect(owner).safeTransferFrom(owner.address, address5.address, 2334))
             .to.be.revertedWith('Given tokenId does not exist')
 
         })
@@ -1130,11 +1131,11 @@ describe("CenterFacet", () => {
         it('_safeTransferFrom function reverting if from address is not owner or approaved address', async () => {
 
             // Not approved or owner wallet transfering the wallet is not successful (Connect wallet and token to transferFrom are different)
-            await CenterFacet.connect(address1)._safeTransferFrom(address2.address, address5.address, tokenIdsOfAddress2[0], bytesInput)
+            await CenterFacet.connect(address1).safeTransferFrom(address2.address, address5.address, tokenIdsOfAddress2[0], bytesInput)
             expect(await ERC721AFacet.ownerOf(tokenIdsOfAddress2[0])).to.equal(address2.address)
 
             // Not approved or owner wallet transfering the wallet is not successful (tokenId doesn't not belong to the connect wallet or the from address)
-            await CenterFacet.connect(address1)._safeTransferFrom(address1.address, address5.address, tokenIdsOfAddress2[0], bytesInput)
+            await CenterFacet.connect(address1).safeTransferFrom(address1.address, address5.address, tokenIdsOfAddress2[0], bytesInput)
             expect(await ERC721AFacet.ownerOf(tokenIdsOfAddress2[0])).to.equal(address2.address)
 
         })
@@ -1148,7 +1149,7 @@ describe("CenterFacet", () => {
             const amountToMint = 4
             await helpers.time.increaseTo((await SaleHandlerFacet.saleTimestamp()).add((await SaleHandlerFacet.privSaleLength()).add(await SaleHandlerFacet.publicSaleLength())))
             await expect(CenterFacet.connect(address1).mint(amountToMint, merkleProof2, {value:price*amountToMint}))
-            .to.be.revertedWith('Sale has either not started or ended already')
+            .to.be.revertedWith('CenterFacet: Sale is not active')
 
         })
 
