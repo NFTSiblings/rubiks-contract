@@ -28,7 +28,7 @@ interface ICenterFacet {
 
     function toggleBurnStatus() external;
 
-    function setERC721Facet(address _ERC721AFacet) external;
+    function setERC721AFacet(address _ERC721AFacet) external;
 
     function reserve(uint256 amount) external;
 

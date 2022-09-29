@@ -1,31 +1,35 @@
+const facetName = "PaymentSplitterFacet"
+const Diamond = "0x31D7Fe07B61CB11f66A502a6990926B18A633A77"
+// const DiamondInit = "0x2440FbB92BADC44dAb731634B46842a3D73EBC41"
+const DiamondInit = false
+
+////////////////////////////////////////////////////////////////////////////
+
 const { ethers } = require('hardhat')
 const { getSelectors, FacetCutAction } = require('./libraries/diamond.js')
 
-const facetName = "CenterFacet";
-const diamondAddress = "0x31D7Fe07B61CB11f66A502a6990926B18A633A77";
-const diamondInitAddress = "0x719C20b49eFb87f30043673a862dFc980aFCff77";
-const zeroAddress = "0x0000000000000000000000000000000000000000";
-
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  const [deployer] = await ethers.getSigners()
   
-  console.log("Deploying contracts with the account:", deployer.address);
-  
-  console.log("Account balance:", (await deployer.getBalance()).toString());
+  console.log("Deploying facet with the account:", deployer.address)
+  console.log("Account balance:", (await deployer.getBalance()).toString())
 
   ////////////////////////////////////////////////////////////////////////////
   
-  const Facet = await ethers.getContractFactory(facetName);
-  const facet = await Facet.deploy();
-  await facet.deployed();
+  const Facet = await ethers.getContractFactory(facetName)
+  const facet = await Facet.deploy()
+  await facet.deployed()
   
-  console.log("New contract address:", facet.address);
+  console.log(`${facetName} deployed: ${facet.address}`)
 
   ////////////////////////////////////////////////////////////////////////////
 
   // get existing deployed DiamondInit contract
-  const diamondInit = await ethers.getContractAt('DiamondInit', diamondInitAddress)
-  console.log('DiamondInit contract exists at:', diamondInit.address)
+  let diamondInit
+  if (DiamondInit) {
+    diamondInit = await ethers.getContractAt('DiamondInit', DiamondInit)
+    console.log('DiamondInit contract exists at:', diamondInit.address)
+  }
 
   ////////////////////////////////////////////////////////////////////////////
 
@@ -33,22 +37,24 @@ async function main() {
     facetAddress: facet.address,
     action: FacetCutAction.Add,
     functionSelectors: getSelectors(facet)
-  }];
+  }]
 
   console.log('')
   console.log('Diamond Cut:', cut)
 
   ////////////////////////////////////////////////////////////////////////////
 
-  const diamondCut = await ethers.getContractAt('IDiamondCut', diamondAddress)
+  const diamondCut = await ethers.getContractAt('IDiamondCut', Diamond)
   let tx
   let receipt
 
   // call to init function
-  // let functionCall = diamondInit.interface.encodeFunctionData('init' + facetName)
-  // tx = await diamondCut.diamondCut(cut, diamondInitAddress, functionCall)
-
-  tx = await diamondCut.diamondCut(cut, zeroAddress, [])
+  if (DiamondInit) {
+    let functionCall = diamondInit.interface.encodeFunctionData('init' + facetName)
+    tx = await diamondCut.diamondCut(cut, DiamondInit, functionCall)
+  } else {
+    tx = await diamondCut.diamondCut(cut, ethers.constants.AddressZero, [])
+  }
 
   console.log('Diamond cut tx: ', tx.hash)
   receipt = await tx.wait()
@@ -60,14 +66,12 @@ async function main() {
   ////////////////////////////////////////////////////////////////////////////
 
   console.log('Verifying new facet:')
-  await hre.run("verify:verify", {
-    address: facet.address
-  });
+  await hre.run("verify:verify", { address: facet.address })
 }
   
-  main()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error(error);
-      process.exit(1);
-    });
+// We recommend this pattern to be able to use async/await everywhere
+// and properly handle errors.
+main().catch((error) => {
+  console.error(error)
+  process.exitCode = 1
+})

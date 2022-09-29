@@ -1,18 +1,17 @@
-require("@nomiclabs/hardhat-waffle");
-require("@nomiclabs/hardhat-etherscan");
-require("@nomiclabs/hardhat-ganache");
-require("@nomiclabs/hardhat-ethers");
+require("@nomicfoundation/hardhat-toolbox");
+
+require('dotenv').config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.7",
   networks: {
-    rinkeby: {
-      url: process.env.url,
-      accounts: [process.env.accounts]
+    goerli: {
+      url: "https://goerli.infura.io/v3/" + process.env.infuraApiKey,
+      accounts: [process.env.ethanDevWalletPrivKey]
     }
   },
   etherscan: {
-    apiKey: process.env.apiKey
+    apiKey: process.env.etherscanApiKey
   }
 };
