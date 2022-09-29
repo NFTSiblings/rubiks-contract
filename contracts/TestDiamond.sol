@@ -16,8 +16,10 @@ import { GlobalState } from "./libraries/GlobalState.sol";
 import { LibDiamond } from "./libraries/LibDiamond.sol";
 import { IDiamondCut } from "./interfaces/IDiamondCut.sol";
 import { CenterFacetLib } from "./libraries/CenterFacetLib.sol";
+// ERC721AStorage Library is required by test helper functions - this does not need to be imported in production version
+import { ERC721AStorage } from 'erc721a-upgradeable/contracts/ERC721AStorage.sol';
 
-contract ERC721ADiamondTemplateTest {    
+contract TestRubiksCubeDiamond {    
 
     constructor(address _diamondCutFacet) payable {        
         GlobalState.getState().owner = msg.sender;
@@ -31,10 +33,6 @@ contract ERC721ADiamondTemplateTest {
             functionSelectors: functionSelectors
         });
         LibDiamond.diamondCut(cut, address(0), "");        
-    }
-
-    function safeMint(uint256 amount) public {
-        CenterFacetLib.safeMint(amount);
     }
 
     fallback() external payable {
@@ -67,4 +65,10 @@ contract ERC721ADiamondTemplateTest {
     }
 
     receive() external payable {}
+
+    // TEST HELPER FUNCTIONS - THESE SHOULD NOT BE INCLUDED IN THE PRODUCTION VERSION
+
+    function resetNumberMinted(address _addr) public {
+        ERC721AStorage.layout()._packedAddressData[_addr] = (0 << 64) | 0;
+    }
 }
