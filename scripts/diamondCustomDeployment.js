@@ -1,21 +1,21 @@
-const diamondName = "ERC721ADiamondTemplate"
+const diamondName = "TestRubiksCubeDiamond"
 // set DiamondInit to the contract address of an existing initialiser contract,
 // or set it to "deploy" to have the script deploy it, or set it to false to
 // deploy without an intialiser contract.
-const DiamondInit = "0xFFeB46fE993b2dB2330694e0088831B4F2E213d9"
-const existingFacets = { // Rinkeby
+const DiamondInit = "0x7c6008DB09Ad2B86415E24ffb23d18D9CeeEcB83"
+const existingFacets = { // Goerli
   // if DiamondCutFacet is not present, it will be deployed
-  DiamondCutFacet: "0x3C616F532cBA23F2A2690B12FCA495aAD4a16E43",
-  DiamondLoupeFacet: "0x706985da9e528b86c0553d676cac0315ff3c8d48",
-  AdminPauseFacet: "0x92e28663ebf433d8a3785d96a70a6233dff60233",
-  AdminPrivilegesFacet: "0x4b5f7cb0ebe63bfc7a125e7bea74f6beb5aef987",
-  AllowlistFacet: "0x8cce85961d8fc6ef0c70a5ef21df0c0b190465d6",
-  ERC721AFacet: "0x80d2c3f931ffbdf2977c4517a6319a46ffd5fdf7",
-  CenterFacet: "0x2419740564746c90b64d0cc105f15617e4fe5462",
-  ERC165Facet: "0x56e20b2e43a9b5862103d4e020e593fb5974bad5",
-  RoyaltiesConfigFacet: "0x74a71e558abf9ed54a238c1e30041d6ed510260e",
-  SaleHandlerFacet: "0xf8c21152fd4402a181ce17654ff196e5e76060fc",
-  PaymentSplitterFacet: "0x1172c87e415f701c15c400a8114562d1475d1632"
+  DiamondCutFacet: "0xda1b9A1DA02f1B5868Da7924679056C40cF7a25E",
+  DiamondLoupeFacet: "0x48B0e6eE743eF0F1fdE73BF31d9503Af346a668d",
+  AdminPauseFacet: "0xE205194889E98Bab7321589580579F2085D5F622",
+  AdminPrivilegesFacet: "0xD856D9C6C380f2791a6B0287736F1b4c8D32F730",
+  AllowlistFacet: "0xEAb224FB204eBC7a399D70E1Db26beB5e48Be05e",
+  ERC721AFacet: "0x23bfba4Dfc1661DD66BBdcD54843Af7f5f38c6A8",
+  CenterFacet: "0x810bAb7C35A8f14843537E8B7702f079D80066a8",
+  ERC165Facet: "0x2E86755E180edAbC72B61069a0520EcB10545346",
+  RoyaltiesConfigFacet: "0x7cAc10CbA5e21ce5F79cB9FdD35AA359922c3314",
+  SaleHandlerFacet: "0xFd63CCB9A34F17775527caA3b97e3bF98a876c82",
+  PaymentSplitterFacet: "0x659A7730B5c5c2f2ED24307BFfBA3347F38B3150"
 }
 const excludeFunctions = {
   ERC721AFacet: [
@@ -24,7 +24,10 @@ const excludeFunctions = {
     "_safeMint(address,uint256,bytes)",
     "_getAux(address)",
     "_burn(uint256)",
-    "_burn(uint256,bool)"
+    "_burn(uint256,bool)",
+    "safeTransferFrom(address,address,uint256)",
+    "safeTransferFrom(address,address,uint256,bytes)",
+    "transferFrom(address,address,uint256)"
   ]
 }
 

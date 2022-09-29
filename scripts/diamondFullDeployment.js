@@ -1,7 +1,8 @@
 // Console messages are currently disabled for testing purposes.
 // They should be reenabled for deployments to testnets or mainnet!
 const allowConsoleLogging = false
-const diamondName = "TestRubiksCubeDiamond" // TEST VERSION
+const useTestVersion = true //set this to true before running tests
+let diamondName = "RubiksCubeDiamond"
 const excludeFacets = ["ExcludedFacet"]
 const excludeFunctions = {
   ERC721AFacet: [
@@ -31,6 +32,7 @@ async function deployDiamond () {
   if (allowConsoleLogging) console.log('DiamondCutFacet deployed:', diamondCutFacet.address)
 
   // deploy Diamond
+  if (useTestVersion) diamondName = "Test" + diamondName
   const Diamond = await ethers.getContractFactory(diamondName)
   const diamond = await Diamond.deploy(diamondCutFacet.address)
   await diamond.deployed()
