@@ -1,7 +1,57 @@
-const facetName = "PaymentSplitterFacet"
-const Diamond = "0x31D7Fe07B61CB11f66A502a6990926B18A633A77"
+const facetName = "ERC721AFacet"
+const Diamond = "0xCACA247E67A9E57b36c266db378Cf29d828256fF"
 // const DiamondInit = "0x2440FbB92BADC44dAb731634B46842a3D73EBC41"
 const DiamondInit = false
+const excludeFunctions = [
+  "_BITMASK_ADDRESS()",
+  "_BITMASK_ADDRESS_DATA_ENTRY()",
+  "_BITMASK_AUX_COMPLEMENT()",
+  "_BITMASK_BURNED()",
+  "_BITMASK_EXTRA_DATA_COMPLEMENT()",
+  "_BITMASK_NEXT_INITIALIZED()",
+  "_BITPOS_AUX()",
+  "_BITPOS_EXTRA_DATA()",
+  "_BITPOS_NEXT_INITIALIZED()",
+  "_BITPOS_NUMBER_BURNED()",
+  "_BITPOS_NUMBER_MINTED()",
+  "_BITPOS_START_TIMESTAMP()",
+  "_MAX_MINT_ERC2309_QUANTITY_LIMIT()",
+  "_TRANSFER_EVENT_SIGNATURE()",
+  "__burn(uint256,bool)",
+  "__burn(uint256)",
+  "__checkContractOnERC721Received(address,address,uint256,bytes)",
+  "__extraData(address,address,uint24)",
+  "__getApprovedSlotAndAddress(uint256)",
+  "__getAux(address)",
+  "__initializeOwnershipAt(uint256)",
+  "__isSenderApprovedOrOwner(address,address,address)",
+  "__mint(address,uint256)",
+  "__nextExtraData(address,address,uint256)",
+  "__nextInitializedFlag(uint256)",
+  "__ownershipAt(uint256)",
+  "__ownershipOf(uint256)",
+  "__packOwnershipData(address,uint256)",
+  "__packedOwnershipOf(uint256)",
+  "__safeMint(address,uint256,bytes)",
+  "__safeMint(address,uint256)",
+  "__setAux(address,uint64)",
+  "__setExtraDataAt(uint256,uint24)",
+  "__startTokenId()",
+  "__unpackedOwnership(uint256)",
+  "_checkContractOnERC721Received(address,address,uint256,bytes)",
+  "_explicitOwnershipOf(uint256)",
+  "_getApprovedSlotAndAddress(uint256)",
+  "_isSenderApprovedOrOwner(address,address,address)",
+  "_nextExtraData(address,address,uint256)",
+  "_nextInitializedFlag(uint256)",
+  "_packOwnershipData(address,uint256)",
+  "_packedOwnershipOf(uint256)",
+  "_unpackedOwnership(uint256)",
+  "explicitOwnershipOf(uint256)",
+  "safeTransferFrom(address,address,uint256)",
+  "safeTransferFrom(address,address,uint256,bytes)",
+  "transferFrom(address,address,uint256)"
+]
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -36,7 +86,7 @@ async function main() {
   const cut = [{
     facetAddress: facet.address,
     action: FacetCutAction.Add,
-    functionSelectors: getSelectors(facet)
+    functionSelectors: getSelectors(facet).remove(excludeFunctions)
   }]
 
   console.log('')
