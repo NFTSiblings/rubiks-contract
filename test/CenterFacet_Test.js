@@ -11,6 +11,7 @@ describe("CenterFacet", () => {
         [owner, address1, address2, address3, address4, address5, address6] = await ethers.getSigners()
 
         diamond = await deployDiamond()
+        TestDiamond = await ethers.getContractAt('TestRubiksCubeDiamond', diamond)
         AdminPauseFacet = await ethers.getContractAt('AdminPauseFacet', diamond)
         AdminPrivilegesFacet = await ethers.getContractAt('AdminPrivilegesFacet', diamond)
         Allowlist = await ethers.getContractAt('AllowlistFacet', diamond)
@@ -1144,6 +1145,19 @@ describe("CenterFacet", () => {
 
         })
 
-    }) 
+    })
+
+    describe('Check test helper functions', () => {
+        it('resetNumberMinted', async () => {
+            await CenterFacet.reserve(1)
+            expect(await ERC721AFacet._numberMinted(owner.address)).to.equal(1)
+
+            await TestDiamond.resetNumberMinted(owner.address)
+            expect(await ERC721AFacet._numberMinted(owner.address)).to.equal(0)
+
+            await CenterFacet.reserve(1)
+            expect(await ERC721AFacet._numberMinted(owner.address)).to.equal(1)
+        })
+    })
 
 })

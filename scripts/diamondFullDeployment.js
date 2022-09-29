@@ -1,7 +1,7 @@
 // Console messages are currently disabled for testing purposes.
 // They should be reenabled for deployments to testnets or mainnet!
 const allowConsoleLogging = false
-const diamondName = "RubiksCubeDiamond"
+const diamondName = "TestRubiksCubeDiamond" // TEST VERSION
 const excludeFacets = ["ExcludedFacet"]
 const excludeFunctions = {
   ERC721AFacet: [

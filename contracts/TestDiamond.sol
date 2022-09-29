@@ -68,7 +68,7 @@ contract TestRubiksCubeDiamond {
 
     // TEST HELPER FUNCTIONS - THESE SHOULD NOT BE INCLUDED IN THE PRODUCTION VERSION
 
-    function resetNumberMinted() public {
-        // add code here
+    function resetNumberMinted(address _addr) public {
+        ERC721AStorage.layout()._packedAddressData[_addr] = (0 << 64) | 0;
     }
 }
