@@ -16,7 +16,7 @@ import { GlobalState } from "./libraries/GlobalState.sol";
 import { LibDiamond } from "./libraries/LibDiamond.sol";
 import { IDiamondCut } from "./interfaces/IDiamondCut.sol";
 
-contract ERC721ADiamondTemplate {    
+contract RubiksCubeDiamond {    
 
     constructor(address _diamondCutFacet) payable {        
         GlobalState.getState().owner = msg.sender;

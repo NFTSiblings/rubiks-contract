@@ -11,62 +11,61 @@ pragma solidity ^0.8.0;
 
 import { GlobalState } from "../libraries/GlobalState.sol";
 import { CenterFacetLib } from "../libraries/CenterFacetLib.sol";
-
-import { console } from "hardhat/console.sol";
-
 import { SaleHandlerLib } from "../libraries/SaleHandlerLib.sol";
 import { AllowlistLib } from "../libraries/AllowlistLib.sol";
 
-contract CenterFacet {
+import "../interfaces/ICenterFacet.sol";
+
+contract CenterFacet is ICenterFacet {
     // VARIABLE GETTERS //
 
-    function maxSupply() external view returns (uint256) {
+    function maxSupply() external view override returns (uint256) {
         return CenterFacetLib.getState().maxSupply;
     }
 
-    function reservedRemaining() external view returns (uint256) {
+    function reservedRemaining() external view override returns (uint256) {
         return CenterFacetLib.getState().reservedRemaining;
     }
 
-    function walletCap() external view returns (uint256) {
+    function walletCap() external view override returns (uint256) {
         return CenterFacetLib.getState().walletCap;
     }
 
-    function priceAL() external view returns (uint256) {
+    function priceAL() external view override returns (uint256) {
         return CenterFacetLib.getState().price[0];
     }
 
-    function price() external view returns (uint256) {
+    function price() external view override returns (uint256) {
         return CenterFacetLib.getState().price[1];
     }
 
-    function burnStatus() external view returns (bool) {
+    function burnStatus() external view override returns (bool) {
         return CenterFacetLib.getState().burnStatus;
     }
 
-    function ERC721AFacet() external view returns (address) {
+    function ERC721AFacet() external view override returns (address) {
         return CenterFacetLib.getState().ERC721AFacet;
     }
 
-    function level(uint256 tokenId) external view returns (uint256) {
+    function level(uint256 tokenId) external view override returns (uint256) {
         require(CenterFacetLib._exists(tokenId), "Given tokenId doesn't exist");
         return CenterFacetLib.getState().levels[tokenId];
     }
 
     // SETUP & ADMIN FUNCTIONS //
 
-    function setPrices(uint256 _priceAL, uint256 _price) external {
+    function setPrices(uint256 _priceAL, uint256 _price) external override {
         GlobalState.requireCallerIsAdmin();
         CenterFacetLib.getState().price[0] = _priceAL;
         CenterFacetLib.getState().price[1] = _price;
     }
 
-    function setWalletCap(uint256 _walletCap) external {
+    function setWalletCap(uint256 _walletCap) external override {
         GlobalState.requireCallerIsAdmin();
         CenterFacetLib.getState().walletCap = _walletCap;
     }
 
-    function toggleBurnStatus() external {
+    function toggleBurnStatus() external override {
         GlobalState.requireCallerIsAdmin();
         CenterFacetLib.getState().burnStatus = !CenterFacetLib.getState().burnStatus;
     }
@@ -76,12 +75,12 @@ contract CenterFacet {
         CenterFacetLib.getState().baseURI = URI;
     }
 
-    function setERC721AFacet(address addr) external {
+    function setERC721AFacet(address _ERC721AFacet) external override {
         GlobalState.requireCallerIsAdmin();
-        CenterFacetLib.getState().ERC721AFacet = addr;
+        CenterFacetLib.getState().ERC721AFacet = _ERC721AFacet;
     }
 
-    function reserve(uint256 amount) public {
+    function reserve(uint256 amount) external override {
         GlobalState.requireCallerIsAdmin();
         int256 check = int256(CenterFacetLib.getState().reservedRemaining) - int256(amount);
         require(check >= 0, "Not enough reserved mint remaining");
@@ -91,7 +90,7 @@ contract CenterFacet {
 
     // PUBLIC FUNCTIONS //
 
-    function mint(uint256 amount, bytes32[] calldata _merkleProof) external payable {
+    function mint(uint256 amount, bytes32[] calldata _merkleProof) external override payable {
         GlobalState.requireContractIsNotPaused();
         uint256 phase;
         if(SaleHandlerLib.isPrivSaleActive()) {
@@ -120,7 +119,7 @@ contract CenterFacet {
         CenterFacetLib.safeMint(amount);
     }
 
-    function burn(uint256 tokenId) external {
+    function burn(uint256 tokenId) external override {
         GlobalState.requireContractIsNotPaused();
         require(CenterFacetLib.getState().burnStatus, "CenterFacet: token burning is not available now");
         CenterFacetLib._burn(tokenId);
@@ -133,18 +132,18 @@ contract CenterFacet {
         return string(abi.encodePacked(baseURI, CenterFacetLib._toString(tokenId)));
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) external payable {
+    function transferFrom(address from, address to, uint256 tokenId) external override payable {
         CenterFacetLib._beforeTokenTransfer(from, to, tokenId, abi.encodeWithSignature(
             "_transferFrom(address,address,uint256)", from, to, tokenId
         ));
     }
-    function safeTransferFrom(address from, address to, uint256 tokenId) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId) external override payable {
         CenterFacetLib._beforeTokenTransfer(from, to, tokenId, abi.encodeWithSignature(
             "_safeTransferFrom(address,address,uint256)", from, to, tokenId
         ));
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external payable {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external override payable {
         CenterFacetLib._beforeTokenTransfer(from, to, tokenId, abi.encodeWithSignature(
             "_safeTransferFrom(address,address,uint256,bytes)", from, to, tokenId, _data
         ));
