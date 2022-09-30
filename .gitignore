@@ -1,5 +1,6 @@
 .env
 artifacts
 cache
+.DS_STORE
 
 node_modules
