@@ -100,10 +100,12 @@ async function deployDiamond () {
   })
 
   const cut = []
+  const FacetAddresses = []
   for (const FacetName of FacetNames) {
     const Facet = await ethers.getContractFactory(FacetName)
     const facet = await Facet.deploy()
     await facet.deployed()
+    FacetAddresses.push(facet.address)
     if (allowConsoleLogging) console.log(`${FacetName} deployed: ${facet.address}`)
     
     let remove = []
@@ -133,7 +135,25 @@ async function deployDiamond () {
     throw Error(`Diamond cut failed: ${tx.hash}`)
   }
   if (allowConsoleLogging) console.log('Completed diamond cut')
-  return diamond.address
+  
+  const CenterFacetDeployed = await ethers.getContractAt('CenterFacet', diamond.address)
+  await CenterFacetDeployed.setERC721AFacet(FacetAddresses[6])
+  const diamondAddresses = new Object()
+  diamondAddresses.Diamond = diamond.address
+  diamondAddresses.DiamondInit = diamondInit.address
+  diamondAddresses.AdminPauseFacet = FacetAddresses[0]
+  diamondAddresses.AdminPrivilegesFacet = FacetAddresses[1]
+  diamondAddresses.AllowlistFacet = FacetAddresses[2]
+  diamondAddresses.CenterFacet = FacetAddresses[3]
+  diamondAddresses.DiamondCutFacet = diamondCutFacet.address
+  diamondAddresses.DiamondLoupeFacet = FacetAddresses[4]
+  diamondAddresses.ERC165Facet = FacetAddresses[5]
+  diamondAddresses.ERC721AFacet = FacetAddresses[6]
+  diamondAddresses.PaymentSplitterFacet = FacetAddresses[7]
+  diamondAddresses.RoyaltiesConfigFacet = FacetAddresses[8]
+  diamondAddresses.SaleHandlerFacet = FacetAddresses[9]
+
+  return diamondAddresses
 }
 
 // We recommend this pattern to be able to use async/await everywhere

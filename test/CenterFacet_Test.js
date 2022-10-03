@@ -11,20 +11,18 @@ describe("CenterFacet", () => {
         [owner, address1, address2, address3, address4, address5, address6] = await ethers.getSigners()
 
         diamond = await deployDiamond()
-        TestDiamond = await ethers.getContractAt('TestRubiksCubeDiamond', diamond)
-        AdminPauseFacet = await ethers.getContractAt('AdminPauseFacet', diamond)
-        AdminPrivilegesFacet = await ethers.getContractAt('AdminPrivilegesFacet', diamond)
-        Allowlist = await ethers.getContractAt('AllowlistFacet', diamond)
-        CenterFacet = await ethers.getContractAt('CenterFacet', diamond)
-        DiamondCutFacet = await ethers.getContractAt('DiamondCutFacet', diamond)
-        DiamondLoupeFacet = await ethers.getContractAt('DiamondLoupeFacet', diamond)
-        ERC165Facet = await ethers.getContractAt('ERC165Facet', diamond)
-        ERC721AFacet = await ethers.getContractAt('ERC721AFacet', diamond)
-        PaymentSplitterFacet = await ethers.getContractAt('PaymentSplitterFacet', diamond)
-        RoyaltiesConfigFacet = await ethers.getContractAt('RoyaltiesConfigFacet', diamond)
-        SaleHandlerFacet = await ethers.getContractAt('SaleHandlerFacet', diamond)
-
-        await CenterFacet.setERC721AFacet(ERC721AFacet.address)
+        TestDiamond = await ethers.getContractAt('TestRubiksCubeDiamond', diamond.Diamond)
+        AdminPauseFacet = await ethers.getContractAt('AdminPauseFacet', diamond.Diamond)
+        AdminPrivilegesFacet = await ethers.getContractAt('AdminPrivilegesFacet', diamond.Diamond)
+        Allowlist = await ethers.getContractAt('AllowlistFacet', diamond.Diamond)
+        CenterFacet = await ethers.getContractAt('CenterFacet', diamond.Diamond)
+        DiamondCutFacet = await ethers.getContractAt('DiamondCutFacet', diamond.Diamond)
+        DiamondLoupeFacet = await ethers.getContractAt('DiamondLoupeFacet', diamond.Diamond)
+        ERC165Facet = await ethers.getContractAt('ERC165Facet', diamond.Diamond)
+        ERC721AFacet = await ethers.getContractAt('ERC721AFacet', diamond.Diamond)
+        PaymentSplitterFacet = await ethers.getContractAt('PaymentSplitterFacet', diamond.Diamond)
+        RoyaltiesConfigFacet = await ethers.getContractAt('RoyaltiesConfigFacet', diamond.Diamond)
+        SaleHandlerFacet = await ethers.getContractAt('SaleHandlerFacet', diamond.Diamond)
         
         priceAl = ethers.utils.parseEther('0.001')
         price = ethers.utils.parseEther('0.0015')
@@ -121,7 +119,7 @@ describe("CenterFacet", () => {
 
         it('Check the initial states', async () => {
 
-            expect(await CenterFacet.ERC721AFacet()).to.equal(ERC721AFacet.address)
+            expect(await CenterFacet.ERC721AFacet()).to.equal(diamond.ERC721AFacet)
 
         })
         
@@ -592,16 +590,12 @@ describe("CenterFacet", () => {
             // Based on the following four situations come up:
             // 1 => (0, 0); 2 => (1, 0); 3 => (0, 1); 4 => (1, 1)
 
-            let tokenIdToBeSend
-
             // Situation 1 (0, 0) -> (1, 0) (No burn/merge)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
             let firstTokenIdSent = tokenIdsOfAddress1[0]
             expect(await CenterFacet.level(firstTokenIdSent)).to.equal(0)
-            let tx1 = await CenterFacet.connect(address1).transferFrom(address1.address, address5.address, firstTokenIdSent)
-            let receipt1 = await tx1.wait()
-            expect(receipt1.status).to.equal(1)
+            await CenterFacet.connect(address1).transferFrom(address1.address, address5.address, firstTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -615,9 +609,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let secondTokenIdSent = tokenIdsOfAddress3[1]
             expect(await CenterFacet.level(secondTokenIdSent)).to.equal(0)
-            let tx2 = await CenterFacet.connect(address3).transferFrom(address3.address, address5.address, secondTokenIdSent)
-            let receipt2 = await tx2.wait()
-            expect(receipt2.status).to.equal(1)
+            await CenterFacet.connect(address3).transferFrom(address3.address, address5.address, secondTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address3.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -633,9 +625,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let thirdTokenIdSent = tokenIdsOfAddress6[0]
             expect(await CenterFacet.level(thirdTokenIdSent)).to.equal(0)
-            let tx3 = await CenterFacet.connect(address6).transferFrom(address6.address, address5.address, thirdTokenIdSent)
-            let receipt3 = await tx3.wait()
-            expect(receipt3.status).to.equal(1)
+            await CenterFacet.connect(address6).transferFrom(address6.address, address5.address, thirdTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address6.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -651,9 +641,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             let fourthTokenIdSent = tokenIdsOfOwner[2]
             expect(await CenterFacet.level(fourthTokenIdSent)).to.equal(0)
-            let tx4 = await CenterFacet.connect(owner).transferFrom(owner.address, address5.address, fourthTokenIdSent)
-            let receipt4 = await tx4.wait()
-            expect(receipt4.status).to.equal(1)
+            await CenterFacet.connect(owner).transferFrom(owner.address, address5.address, fourthTokenIdSent)
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 3)
@@ -680,9 +668,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
            let firstTokenIdSent = tokenIdsOfAddress2[0]
            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(1)
-           let tx1 = await CenterFacet.connect(address2).transferFrom(address2.address, address5.address, firstTokenIdSent)
-           let receipt1 = await tx1.wait()
-           expect(receipt1.status).to.equal(1)
+           await CenterFacet.connect(address2).transferFrom(address2.address, address5.address, firstTokenIdSent)
            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(0)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -696,9 +682,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            let secondTokenIdSent = tokenIdsOfOwner[1]
            expect(await CenterFacet.level(secondTokenIdSent)).to.equal(1)
-           let tx2 = await CenterFacet.connect(owner).transferFrom(owner.address, address5.address, secondTokenIdSent)
-           let receipt2 = await tx2.wait()
-           expect(receipt2.status).to.equal(1)
+           await CenterFacet.connect(owner).transferFrom(owner.address, address5.address, secondTokenIdSent)
            expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -714,20 +698,49 @@ describe("CenterFacet", () => {
         it('transferFrom function working as intended and checking merge works as intended for 5x5', async () => {
 
             // As there is no merge for 5x5 cubes, transfering a 5x5 cube should work as regular transfer
+            tokenIdSent = tokenIdsOfOwner[0]
+
+            // Receiving wallet has 3x3 cube
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(3)
-            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
-            let firstTokenIdSent = tokenIdsOfOwner[0]
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
-            let tx = await CenterFacet.connect(owner).transferFrom(owner.address, address4.address, firstTokenIdSent)
-            let receipt = await tx.wait()
-            expect(receipt.status).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(owner).transferFrom(owner.address, address1.address, tokenIdSent)
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress1 = await ERC721AFacet.tokensOfOwner(address1.address)
+            expect(newTokenIdsOfAddress1.length).to.equal(2)
+            expect(newTokenIdsOfAddress1[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress1[1]).to.equal(tokenIdsOfAddress1[0])
+
+            // Receiving wallet has 4x4 cube
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address1).transferFrom(address1.address, address2.address, tokenIdSent)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress2 = await ERC721AFacet.tokensOfOwner(address2.address)
+            expect(newTokenIdsOfAddress2.length).to.equal(2)
+            expect(newTokenIdsOfAddress2[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress2[1]).to.equal(tokenIdsOfAddress2[0])
+
+
+            // Receiving wallet has a 5x5 cube
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address2).transferFrom(address2.address, address4.address, tokenIdSent)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
             const newTokenIdsOfAddress4 = await ERC721AFacet.tokensOfOwner(address4.address)
             expect(newTokenIdsOfAddress4.length).to.equal(2)
-            expect(newTokenIdsOfAddress4[0]).to.equal(firstTokenIdSent)
+            expect(newTokenIdsOfAddress4[0]).to.equal(tokenIdSent)
             expect(newTokenIdsOfAddress4[1]).to.equal(tokenIdsOfAddress4[0])
 
         })
@@ -782,16 +795,12 @@ describe("CenterFacet", () => {
             // Based on the following four situations come up:
             // 1 => (0, 0); 2 => (1, 0); 3 => (0, 1); 4 => (1, 1)
 
-            let tokenIdToBeSend
-
             // Situation 1 (0, 0) -> (1, 0) (No burn/merge)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
             let firstTokenIdSent = tokenIdsOfAddress1[0]
             expect(await CenterFacet.level(firstTokenIdSent)).to.equal(0)
-            let tx1 = await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256)"](address1.address, address5.address, firstTokenIdSent)
-            let receipt1 = await tx1.wait()
-            expect(receipt1.status).to.equal(1)
+            await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256)"](address1.address, address5.address, firstTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -805,9 +814,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let secondTokenIdSent = tokenIdsOfAddress3[1]
             expect(await CenterFacet.level(secondTokenIdSent)).to.equal(0)
-            let tx2 = await CenterFacet.connect(address3)["safeTransferFrom(address,address,uint256)"](address3.address, address5.address, secondTokenIdSent)
-            let receipt2 = await tx2.wait()
-            expect(receipt2.status).to.equal(1)
+            await CenterFacet.connect(address3)["safeTransferFrom(address,address,uint256)"](address3.address, address5.address, secondTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address3.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -823,9 +830,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let thirdTokenIdSent = tokenIdsOfAddress6[0]
             expect(await CenterFacet.level(thirdTokenIdSent)).to.equal(0)
-            let tx3 = await CenterFacet.connect(address6)["safeTransferFrom(address,address,uint256)"](address6.address, address5.address, thirdTokenIdSent)
-            let receipt3 = await tx3.wait()
-            expect(receipt3.status).to.equal(1)
+            await CenterFacet.connect(address6)["safeTransferFrom(address,address,uint256)"](address6.address, address5.address, thirdTokenIdSent)
             expect(await ERC721AFacet.balanceOf(address6.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -841,9 +846,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             let fourthTokenIdSent = tokenIdsOfOwner[2]
             expect(await CenterFacet.level(fourthTokenIdSent)).to.equal(0)
-            let tx4 = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address5.address, fourthTokenIdSent)
-            let receipt4 = await tx4.wait()
-            expect(receipt4.status).to.equal(1)
+            await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address5.address, fourthTokenIdSent)
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 3)
@@ -870,9 +873,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
            let firstTokenIdSent = tokenIdsOfAddress2[0]
            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(1)
-           let tx1 = await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256)"](address2.address, address5.address, firstTokenIdSent)
-           let receipt1 = await tx1.wait()
-           expect(receipt1.status).to.equal(1)
+           await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256)"](address2.address, address5.address, firstTokenIdSent)
            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(0)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -886,9 +887,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            let secondTokenIdSent = tokenIdsOfOwner[1]
            expect(await CenterFacet.level(secondTokenIdSent)).to.equal(1)
-           let tx2 = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address5.address, secondTokenIdSent)
-           let receipt2 = await tx2.wait()
-           expect(receipt2.status).to.equal(1)
+           await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address5.address, secondTokenIdSent)
            expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -904,20 +903,49 @@ describe("CenterFacet", () => {
         it('safeTransferFrom function working as intended and checking merge works as intended for 5x5', async () => {
 
             // As there is no merge for 5x5 cubes, transfering a 5x5 cube should work as regular transfer
+            tokenIdSent = tokenIdsOfOwner[0]
+
+            // Receiving wallet has 3x3 cube
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(3)
-            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
-            let firstTokenIdSent = tokenIdsOfOwner[0]
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
-            let tx = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address4.address, firstTokenIdSent)
-            let receipt = await tx.wait()
-            expect(receipt.status).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256)"](owner.address, address1.address, tokenIdSent)
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress1 = await ERC721AFacet.tokensOfOwner(address1.address)
+            expect(newTokenIdsOfAddress1.length).to.equal(2)
+            expect(newTokenIdsOfAddress1[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress1[1]).to.equal(tokenIdsOfAddress1[0])
+
+            // Receiving wallet has 4x4 cube
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256)"](address1.address, address2.address, tokenIdSent)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress2 = await ERC721AFacet.tokensOfOwner(address2.address)
+            expect(newTokenIdsOfAddress2.length).to.equal(2)
+            expect(newTokenIdsOfAddress2[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress2[1]).to.equal(tokenIdsOfAddress2[0])
+
+
+            // Receiving wallet has a 5x5 cube
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256)"](address2.address, address4.address, tokenIdSent)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
             const newTokenIdsOfAddress4 = await ERC721AFacet.tokensOfOwner(address4.address)
             expect(newTokenIdsOfAddress4.length).to.equal(2)
-            expect(newTokenIdsOfAddress4[0]).to.equal(firstTokenIdSent)
+            expect(newTokenIdsOfAddress4[0]).to.equal(tokenIdSent)
             expect(newTokenIdsOfAddress4[1]).to.equal(tokenIdsOfAddress4[0])
 
         })
@@ -973,16 +1001,12 @@ describe("CenterFacet", () => {
             // Based on the following four situations come up:
             // 1 => (0, 0); 2 => (1, 0); 3 => (0, 1); 4 => (1, 1)
 
-            let tokenIdToBeSend
-
             // Situation 1 (0, 0) -> (1, 0) (No burn/merge)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
             let firstTokenIdSent = tokenIdsOfAddress1[0]
             expect(await CenterFacet.level(firstTokenIdSent)).to.equal(0)
-            let tx1 = await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256,bytes)"](address1.address, address5.address, firstTokenIdSent, bytesInput)
-            let receipt1 = await tx1.wait()
-            expect(receipt1.status).to.equal(1)
+            await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256,bytes)"](address1.address, address5.address, firstTokenIdSent, bytesInput)
             expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -996,9 +1020,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let secondTokenIdSent = tokenIdsOfAddress3[1]
             expect(await CenterFacet.level(secondTokenIdSent)).to.equal(0)
-            let tx2 = await CenterFacet.connect(address3)["safeTransferFrom(address,address,uint256,bytes)"](address3.address, address5.address, secondTokenIdSent, bytesInput)
-            let receipt2 = await tx2.wait()
-            expect(receipt2.status).to.equal(1)
+            await CenterFacet.connect(address3)["safeTransferFrom(address,address,uint256,bytes)"](address3.address, address5.address, secondTokenIdSent, bytesInput)
             expect(await ERC721AFacet.balanceOf(address3.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -1014,9 +1036,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             let thirdTokenIdSent = tokenIdsOfAddress6[0]
             expect(await CenterFacet.level(thirdTokenIdSent)).to.equal(0)
-            let tx3 = await CenterFacet.connect(address6)["safeTransferFrom(address,address,uint256,bytes)"](address6.address, address5.address, thirdTokenIdSent, bytesInput)
-            let receipt3 = await tx3.wait()
-            expect(receipt3.status).to.equal(1)
+            await CenterFacet.connect(address6)["safeTransferFrom(address,address,uint256,bytes)"](address6.address, address5.address, thirdTokenIdSent, bytesInput)
             expect(await ERC721AFacet.balanceOf(address6.address)).to.equal(0)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -1032,9 +1052,7 @@ describe("CenterFacet", () => {
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(2)
             let fourthTokenIdSent = tokenIdsOfOwner[2]
             expect(await CenterFacet.level(fourthTokenIdSent)).to.equal(0)
-            let tx4 = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address5.address, fourthTokenIdSent, bytesInput)
-            let receipt4 = await tx4.wait()
-            expect(receipt4.status).to.equal(1)
+            await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address5.address, fourthTokenIdSent, bytesInput)
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
             expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 3)
@@ -1061,9 +1079,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(0)
            let firstTokenIdSent = tokenIdsOfAddress2[0]
            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(1)
-           let tx1 = await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256,bytes)"](address2.address, address5.address, firstTokenIdSent, bytesInput)
-           let receipt1 = await tx1.wait()
-           expect(receipt1.status).to.equal(1)
+           await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256,bytes)"](address2.address, address5.address, firstTokenIdSent, bytesInput)
            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(0)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
@@ -1077,9 +1093,7 @@ describe("CenterFacet", () => {
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            let secondTokenIdSent = tokenIdsOfOwner[1]
            expect(await CenterFacet.level(secondTokenIdSent)).to.equal(1)
-           let tx2 = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address5.address, secondTokenIdSent, bytesInput)
-           let receipt2 = await tx2.wait()
-           expect(receipt2.status).to.equal(1)
+           await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address5.address, secondTokenIdSent, bytesInput)
            expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
            expect(await ERC721AFacet.balanceOf(address5.address)).to.equal(1)
            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply - 1)
@@ -1095,20 +1109,49 @@ describe("CenterFacet", () => {
         it('_safeTransferFrom function working as intended and checking merge works as intended for 5x5', async () => {
 
             // As there is no merge for 5x5 cubes, transfering a 5x5 cube should work as regular transfer
+            tokenIdSent = tokenIdsOfOwner[0]
+
+            // Receiving wallet has 3x3 cube
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(3)
-            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
-            let firstTokenIdSent = tokenIdsOfOwner[0]
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
-            let tx = await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address4.address, firstTokenIdSent, bytesInput)
-            let receipt = await tx.wait()
-            expect(receipt.status).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(owner)["safeTransferFrom(address,address,uint256,bytes)"](owner.address, address1.address, tokenIdSent, [])
             expect(await ERC721AFacet.balanceOf(owner.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress1 = await ERC721AFacet.tokensOfOwner(address1.address)
+            expect(newTokenIdsOfAddress1.length).to.equal(2)
+            expect(newTokenIdsOfAddress1[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress1[1]).to.equal(tokenIdsOfAddress1[0])
+
+            // Receiving wallet has 4x4 cube
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address1)["safeTransferFrom(address,address,uint256,bytes)"](address1.address, address2.address, tokenIdSent, [])
+            expect(await ERC721AFacet.balanceOf(address1.address)).to.equal(1)
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            const newTokenIdsOfAddress2 = await ERC721AFacet.tokensOfOwner(address2.address)
+            expect(newTokenIdsOfAddress2.length).to.equal(2)
+            expect(newTokenIdsOfAddress2[0]).to.equal(tokenIdSent)
+            expect(newTokenIdsOfAddress2[1]).to.equal(tokenIdsOfAddress2[0])
+
+
+            // Receiving wallet has a 5x5 cube
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(2)
+            expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(1)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
+            await CenterFacet.connect(address2)["safeTransferFrom(address,address,uint256,bytes)"](address2.address, address4.address, tokenIdSent, [])
+            expect(await ERC721AFacet.balanceOf(address2.address)).to.equal(1)
             expect(await ERC721AFacet.balanceOf(address4.address)).to.equal(2)
             expect(await ERC721AFacet.totalSupply()).to.equal(olderTotalSupply)
-            expect(await CenterFacet.level(firstTokenIdSent)).to.equal(2)
+            expect(await CenterFacet.level(tokenIdSent)).to.equal(2)
             const newTokenIdsOfAddress4 = await ERC721AFacet.tokensOfOwner(address4.address)
             expect(newTokenIdsOfAddress4.length).to.equal(2)
-            expect(newTokenIdsOfAddress4[0]).to.equal(firstTokenIdSent)
+            expect(newTokenIdsOfAddress4[0]).to.equal(tokenIdSent)
             expect(newTokenIdsOfAddress4[1]).to.equal(tokenIdsOfAddress4[0])
 
         })
@@ -1148,7 +1191,9 @@ describe("CenterFacet", () => {
     })
 
     describe('Check test helper functions', () => {
+
         it('resetNumberMinted', async () => {
+
             await CenterFacet.reserve(1)
             expect(await ERC721AFacet._numberMinted(owner.address)).to.equal(1)
 
@@ -1157,7 +1202,9 @@ describe("CenterFacet", () => {
 
             await CenterFacet.reserve(1)
             expect(await ERC721AFacet._numberMinted(owner.address)).to.equal(1)
+
         })
+
     })
 
 })
