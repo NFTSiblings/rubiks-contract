@@ -1,8 +1,8 @@
-const diamondName = "TestRubiksCubeDiamond"
+const diamondName = "RubiksCubeDiamond"
 // set DiamondInit to the contract address of an existing initialiser contract,
 // or set it to "deploy" to have the script deploy it, or set it to false to
 // deploy without an intialiser contract.
-const DiamondInit = "0x7c6008DB09Ad2B86415E24ffb23d18D9CeeEcB83"
+const DiamondInit = "deploy" //"0x7c6008DB09Ad2B86415E24ffb23d18D9CeeEcB83" 
 const existingFacets = { // Goerli
   // if DiamondCutFacet is not present, it will be deployed
   DiamondCutFacet: "0xda1b9A1DA02f1B5868Da7924679056C40cF7a25E",
@@ -96,11 +96,11 @@ async function deployDiamond () {
 
   let diamondInit
   if (ethers.utils.isAddress(DiamondInit)) {
-    // get existing deployed DiamondInit contract
+    // get existing deployed DiamondInit contract\
     diamondInit = await ethers.getContractAt('DiamondInit', DiamondInit)
     console.log('DiamondInit contract exists at:', diamondInit.address)
   } else if (DiamondInit == "deploy") {
-    // deploy DiamondInit
+    // deploy DiamondInit\
     const DiamondInit = await ethers.getContractFactory('DiamondInit')
     diamondInit = await DiamondInit.deploy()
     await diamondInit.deployed()
@@ -134,7 +134,7 @@ async function deployDiamond () {
   // call to init function
   if (DiamondInit) {
     let functionCall = diamondInit.interface.encodeFunctionData('initAll')
-    tx = await diamondCut.diamondCut(cut, DiamondInit, functionCall)
+    tx = await diamondCut.diamondCut(cut, diamondInit.address, functionCall)
   } else {
     tx = await diamondCut.diamondCut(cut, ethers.constants.AddressZero, [])
   }

@@ -57,17 +57,17 @@ contract DiamondInit {
 
     // CenterFacet //
 
-    address private constant ERC721AFacet = 0x67b85b3564d4a1FD29d82dDd99f96761c25A4949; // rinkeby
+    address private constant ERC721AFacet = 0x23bfba4Dfc1661DD66BBdcD54843Af7f5f38c6A8; // rinkeby
 
     function initCenterFacet() public {
         CenterFacetLib.state storage s = CenterFacetLib.getState();
 
         s.ERC721AFacet = ERC721AFacet;
-        s.maxSupply = 22;
+        s.maxSupply = 5555;
         s.walletCap = 4;
         s.price = [0.001 ether, 0.0015 ether];
         s.baseURI = "https://gateway.pinata.cloud/ipfs/.../?";
-        s.reservedRemaining = 7;
+        s.reservedRemaining = 100;
     }
 
     // ERC165Facet //
